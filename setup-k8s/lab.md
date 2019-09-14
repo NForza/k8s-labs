@@ -6,10 +6,10 @@ If your haven't installed it before, download and install [Docker for Windows](h
 
 #### Enable Kubernetes
 Go to Docker settings and enable Kubernetes on Docker.
-![enable-k8s](images/lab1/docker-enable-k8s.png)
+![enable-k8s](images/docker-enable-k8s.png)
 
 #### Install MicroK8s
-Although you can run most of the labwork, installing a more complete Kubernetes environment makes live easier. And you can easily recreate/remove the lab-environment later.
+Although you can run most of the labwork in Docker Desktop, installing a more complete Kubernetes environment makes life easier. And you can easily recreate/remove the lab-environment later.
 To do that we use [MicroK8s](https://microk8s.io).
 
 
@@ -43,6 +43,6 @@ You can get the ip-address of the VM running MicroK8s by running
 `multipass list`, 
 which will give you something like this:
 
-![](images/lab1/vm-ip.png)
+![](images/vm-ip.png)
 
 Remember this command, as we need that IP address in later labs.
