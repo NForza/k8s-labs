@@ -1,5 +1,7 @@
 ## Running a Docker image in Kubernetes
 
+Use Docker for Desktop with Kubernetes (we are using the local Docker repository from the previous lab):
+
 `kubectl run webapp --image=k8s-labs/simple-webapp --port=8080 --image-pull-policy=Never`
 
 ![](images/kubectl-run.png)
