@@ -1,6 +1,6 @@
 ## Setting up your environment
 
-#### Docker Desktop
+#### Docker Desktop (Basic necessity)
 Make sure you are running Docker Desktop on your machine.
 If your haven't installed it before, download and install [Docker for Windows](https://docs.docker.com/docker-for-windows/install/) or [Docker for Mac](https://docs.docker.com/docker-for-mac/install)
 
@@ -8,7 +8,16 @@ If your haven't installed it before, download and install [Docker for Windows](h
 Go to Docker settings and enable Kubernetes on Docker.
 ![enable-k8s](images/docker-enable-k8s.png)
 
-#### Install MicroK8s
+
+#### Install Minikube (for more advanced labs)
+Minikube is a nice K8s environment ideal for learning and local tinkering. It's also heavily used in a lot of tutorials on the web and i.e. YouTube
+
+All you need is Docker (or similarly compatible) container or a Virtual Machine environment, and Kubernetes is a single command away: minikube start
+
+We already installed Docker for Desktop so we're good to go.
+[Download from here](https://minikube.sigs.k8s.io/docs/start/)
+
+#### Install MicroK8s (Optional)
 Although you can run most of the labwork in Docker Desktop, installing a more complete Kubernetes environment makes life easier. And you can easily recreate/remove the lab-environment later.
 To do that we use [MicroK8s](https://microk8s.io).
 
