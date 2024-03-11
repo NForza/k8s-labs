@@ -10,7 +10,7 @@ If we go to the browser now and enter url http://localhost:8080 we won't see the
 
 That is because we need to expose the port to the 'outside' world first. Just like we did with Docker. (-p option)
 
-`kubectl expose deployment webapp --type=NodePort`
+`kubectl expose pod webapp --type=NodePort`
 
 This will create an object of type Service in Kubernetes. The service runs the redirect of an external port xxxxx to the port of the webapp inside Kubernetes (port 8080). More on that in later labs.
 
