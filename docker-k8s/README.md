@@ -19,6 +19,9 @@ We can look at the details via `kubectl get service`. That will show us the port
 Another way is via `kubectl describe service webapp`
 
 Now we should be able to see our app at http://localhost:30561 (or whatever port is showing up at your machine)
+NOTE: if you are running this in Minikube run the following command to open (port forwarding works differently)
+
+`minikube service webapp`
 
 If you want to debug locally we can also do port forwarding from localhost to some port inside the cluster.
 
