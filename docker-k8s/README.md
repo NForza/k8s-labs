@@ -2,6 +2,8 @@
 
 Use Docker for Desktop with Kubernetes (we are using the local Docker repository from the previous lab):
 
+NOTE: If you are using kubectl with Minikube, execute `eval $(minikube docker-env)` en repeat the steps from previous lab to build and tag the docker-image in the repo that is local to Minikube, otherwise the statements below will not work.
+
 `kubectl run webapp --image=k8s-labs/simple-webapp --port=8080 --image-pull-policy=Never`
 
 ![](images/kubectl-run.png)
