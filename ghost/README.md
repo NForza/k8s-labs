@@ -56,7 +56,7 @@ spec:
         run: ghost
     spec:
       containers:
-      - image: ghost
+      - image: ghost:5.8.3
         name: ghost
         command:
         - sh
@@ -66,6 +66,13 @@ spec:
         volumeMounts:
         - mountPath: /ghost-config
           name: config
+        resources:
+          requests:
+            memory: "64Mi"
+            cpu: "500m"
+          limits:
+            memory: "128Mi"
+            cpu: "1000m"
       volumes:
       - name: config
         configMap:
@@ -81,7 +88,7 @@ Run the deployment:
 `kubectl apply -f ghost.yaml`
 
 And expose the deployment (creating a service and endpoint)
-`kubectl expose deployments ghost --port=2368`
+`kubectl expose deployment ghost --port=2368`
 
 Run:
 `kubectl proxy`
@@ -92,7 +99,7 @@ And visit the url: `http://localhost:8001/api/v1/namespaces/default/services/gho
 
 Of course, this example isn’t very scalable, or even reliable, since the contents of the blog are stored in a local file inside the container. A more scalable approach is to store the blog’s data in a MySQL database.
 
-To do this, first modify config.js to include:
+To do this, first copy ghost-config.js into config-mysql.js and modify ghost-config-mysql.js to include:
 ```
 ...
 database: {
@@ -110,7 +117,7 @@ database: {
 
 Create a new configmap: 
 ```
-kubectl create configmap ghost-config-mysql --from-file ghost-config.js
+kubectl create configmap ghost-config-mysql --from-file ghost-config.js=ghost-config-mysql.js
 ```
 
 And update the ghost.yaml file to use the newly created configmap.
@@ -218,29 +225,29 @@ Setup ingress with a rule to redirect traffic into ghost for `http://<your-ip>/`
 
 Hint:
 enable an ingress controller `microk8s.enable ingress`
+or
+minikube addons enable ingress
 
 Example ingress.yaml file (change to your situation)
 ```
-apiVersion: extensions/v1beta1
+apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
-  name: ingress-webapp
+  name: ghost
   annotations:
-    nginx.ingress.kubernetes.io/rewrite-target: /$2
+    nginx.ingress.kubernetes.io/ssl-redirect: "false"
 spec:
   rules:
-  - host: demo.info
+  - host: "ghost.localhost"
     http:
       paths:
-        - path: /
-          backend:
-            serviceName: webapp
-            servicePort: 8080
-  - http:
-      paths:
-        - path: /app(/|$)(.*)
-          backend:
-            serviceName: webapp
-            servicePort: 8080
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: ghost
+            port:
+              number: 2368
 ```
 
+when you run above with Minikube run ```minikube tunnel``` to make ingress available on localhost
