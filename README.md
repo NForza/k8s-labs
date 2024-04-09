@@ -11,3 +11,4 @@ This repo contains the lab work for the Kubernetes course.
 6. [Scaling](scaling/README.md)
 7. [(External) Helm lab](helm/README.md)
 8. [(External) Linkerd setup](linkerd/README.md)
+9. [Admission](controlling/README.md)
