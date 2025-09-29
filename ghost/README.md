@@ -2,43 +2,45 @@
 Ghost is a popular blogging engine with a clean interface written in JavaScript. It can either use a file-based SQLite database or MySQL for storage.
 
 #### Configuring Ghost
-Ghost is configured with a simple JavaScript file that describes the server. We will store this file as a configuration map. A simple development configuration for Ghost looks like :
+Ghost is configured with a simple Json-file that describes the server. We will store this file as a configuration map. A simple development configuration for Ghost looks like :
 
 ```
-var path = require('path'),
-    config;
 
-config = {
-    development: {
-        url: 'http://localhost:2368',
-        database: {
-            client: 'sqlite3',
-            connection: {
-                filename: path.join(process.env.GHOST_CONTENT,
-                                    '/data/ghost-dev.db')
-            },
-            debug: false
-        },
-        server: {
-            host: '0.0.0.0',
-            port: '2368'
-        },
-        paths: {
-            contentPath: path.join(process.env.GHOST_CONTENT, '/')
-        }
+{
+  "url": "http://localhost:2368",
+  "server": {
+    "port": 2368,
+    "host": "::"
+  },
+  "database": {
+    "client": "sqlite3",
+    "connection": {
+      "filename": "/var/lib/ghost/content/data/ghost.db"
     }
-};
-
-module.exports = config;
+  },
+  "mail": {
+    "transport": "Direct"
+  },
+  "logging": {
+    "transports": [
+      "file",
+      "stdout"
+    ]
+  },
+  "process": "systemd",
+  "paths": {
+    "contentPath": "/var/lib/ghost/content"
+  }
+}
 ```
 
-Once you have this configuration file saved to ghost-config.js, you can create a Kubernetes ConfigMap object using:
+Once you have this configuration file saved to config.production.json, you can create a Kubernetes ConfigMap object using:
 
-`kubectl create cm --from-file ghost-config.js ghost-config` 
+`kubectl create cm --from-file config.production.json ghost-config` 
 
 This creates a ConfigMap that is named ghost-config. 
 
-We will mount this configuration file as a volume inside of our container. We will deploy Ghost as a Deployment object, which defines this volume mount as part of the Pod template
+We will mount this configuration file as a volume inside of our container. We will deploy Ghost as a Deployment object, which defines this volume mount as part of the Pod template:
 
 ```
 apiVersion: apps/v1
@@ -61,7 +63,7 @@ spec:
         command:
         - sh
         - -c
-        - cp /ghost-config/ghost-config.js /var/lib/ghost/config.js
+        - cp /ghost-config/config.production.json /var/lib/ghost/config.production.json
           && /usr/local/bin/docker-entrypoint.sh node current/index.js
         volumeMounts:
         - mountPath: /ghost-config
@@ -79,8 +81,9 @@ spec:
           defaultMode: 420
           name: ghost-config
 ```
+You can save this file as ghost.yaml 
 
-One thing to note here is that we are copying the config.js file from a different location into the location where Ghost expects to find it, since the ConfigMap can only mount directories, not individual files. 
+One thing to note here is that we are copying the config.production.json file from a different location into the location where Ghost expects to find it, since the ConfigMap can only mount directories, not individual files. 
 
 Ghost expects other files that are not in that ConfigMap to be present in its directory, and thus we cannot simply mount the entire ConfigMap into /var/lib/ghost.
 
@@ -112,28 +115,33 @@ This issue can be resolved by finding limits.memory: "128Mi" in the deployment f
 
 Of course, this example isn’t very scalable, or even reliable, since the contents of the blog are stored in a local file inside the container. A more scalable approach is to store the blog’s data in a MySQL database.
 
-To do this, first copy ghost-config.js into config-mysql.js and modify ghost-config-mysql.js to include:
+To do this, first copy config.production.json into config-mysql.json and modify config-mysql.json to include:
+
 ```
 ...
-database: {
-   client: 'mysql',
-   connection: {
-     host     : 'mysql',
-     user     : 'root',
-     password : 'root',
-     database : 'ghost_db',
-     charset  : 'utf8'
-   }
- },
+"database": {
+    "client": "mysql",
+    "connection": {
+      "host": "mysql",
+      "port": 3306,
+      "user": "root",
+      "password": "root",
+      "database": "ghost_db"
+    },
+    "pool": {
+      "min": 2,
+      "max": 20
+    }
+  },
 ...
 ```
 
 Create a new configmap: 
 ```
-kubectl create configmap ghost-config-mysql --from-file ghost-config.js=ghost-config-mysql.js
+kubectl create configmap ghost-config-mysql --from-file config.production.json=config-mysql.json
 ```
 
-And update the ghost.yaml file to use the newly created configmap.
+And update the ghost.yaml file to use the newly created configmap and apply this file with kubectl.
 
 #### Create MySQL environment
 
@@ -168,7 +176,9 @@ spec:
 ```
 
 As we can see this manifest contains multiple items divided by `---`
-Apply this manifest to create the persistent volume and proceed with creating the mysql instance:
+Apply this manifest with kubectl to create the persistent volume.
+
+Next, proceed with creating the mysql instance:
 
 ```
 apiVersion: v1
@@ -215,7 +225,9 @@ spec:
           claimName: mysql-pv-claim
 ```
 
-You will need to create the database in the MySQL database:
+Apply this manifest.
+
+You will need to create the database in the MySQL database (password is root):
 
 ```
 $ kubectl exec -it mysql-<your-instance-here> -- mysql -u root -p
