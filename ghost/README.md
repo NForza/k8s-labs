@@ -95,6 +95,19 @@ Run:
 
 And visit the url: `http://localhost:8001/api/v1/namespaces/default/services/ghost/proxy/`
 
+If you run into trouble, here are a couple of commands to check the status of the deployment:
+`kubectl describe deployment ghost'
+
+or more specific, look at the create pod:
+```
+kubectl get pods 
+kubectl describe pod <inser ghost pod name here>
+```
+
+Probably something went wrong in the deployment, like a memory restriction (you would see a 'killed' event with the pod somewhere)
+This issue can be resolved by finding limits.memory: "128Mi" in the deployment file and changing the value to "256Mi" and apply the yaml file again. This time there should be enough memory for Ghost to start.
+
+
 ## GHOST + MYSQL
 
 Of course, this example isn’t very scalable, or even reliable, since the contents of the blog are stored in a local file inside the container. A more scalable approach is to store the blog’s data in a MySQL database.
