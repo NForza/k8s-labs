@@ -12,3 +12,7 @@ This repo contains the lab work for the Kubernetes course.
 7. [(External) Helm lab](helm/README.md)
 8. [(External) Linkerd setup](linkerd/README.md)
 9. [Admission](controlling/README.md)
+
+10. [Resource limiting](resource-limiting/README.md)
+
+11. [Network policies](network-policies/README.md)
